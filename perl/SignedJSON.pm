@@ -70,7 +70,7 @@ use UR::Utilities qw( getFile putFile );
 use vars qw( $SIGNATURE_KEY );
 
 # key that holds the signature in JSON structure
-$SIGNATURE_KEY = "dgst_sha265_base64";
+$SIGNATURE_KEY = "dgst_sha256_base64";
 
 # path to search for openssl
 my @paths = qw( /bin /usr/bin /usr/local/bin );
@@ -229,7 +229,7 @@ sub verify {
 	my $f;
 	open( $f, "|-", 
 		$self->{'openssl'},
-		'dgst', 
+		'dgst', '-sha256',
 		'-verify', $self->{'publickey'},
 		'-signature', $sfile,
 		'-out', $self->{'tempdir'}.'/out'
