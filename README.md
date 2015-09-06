@@ -9,15 +9,15 @@ Our method is similar to the one described here: http://upon2020.com/blog/2014/0
 
 ### The process of signing is the following:
 
- 1. A binary sha256 signature is calculated for the original JSON file:
+ * A binary sha256 signature is calculated for the original JSON file:
 ```shell
 openssl dgst -sha256 -binary -sign private.pem data.json >signature
 ```
- 2. The signature is base64 encoded:
+ * The signature is base64 encoded:
 ```shell
 base64 -w 0 signature >signature64
 ``` 
- 3. The calculated base64-encoded signature is embedded to the original JSON file immediately after the first opening curly bracket with the key "dgst_sha256_base64".  It is important not to modify in any way the rest of the file. The following perl regular expression can be used:
+ * The calculated base64-encoded signature is embedded to the original JSON file immediately after the first opening curly bracket with the key "dgst_sha256_base64".  It is important not to modify in any way the rest of the file. The following perl regular expression can be used:
 ```perl
 s/^(\s*{)/$1"dgst_sha256_base64":"$signature64",/
 ```
@@ -26,15 +26,15 @@ This way the signed file is still absolutely valid JSON file with all the origin
 
 ### The process of verifying the signature is the opposite:
 
- 1. First we need to extract the signature from JSON-file carefully returning it to the original state it was before we injected the signature there.  This can be done with the following perl code:
+ * First we need to extract the signature from JSON-file carefully returning it to the original state it was before we injected the signature there.  This can be done with the following perl code:
 ```perl
 s/^(\s*{)"dgst_sha256_base64":"([^"]+)",/$1/; my $signature64 = $2;
 ```
- 2. Then we need to decode the signature from base64
+ * Then we need to decode the signature from base64
 ```shell
 base64 -d signature64 >signature
 ```
- 3. Finally verify the signature with openssl:
+ * Finally verify the signature with openssl:
 ```shell
 openssl gdst -verify public.pem -signature signature data.json
 ```
