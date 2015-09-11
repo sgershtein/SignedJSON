@@ -66,7 +66,6 @@ use strict;
 use Carp;
 use File::Path qw( remove_tree );
 use MIME::Base64;
-use UR::Utilities qw( getFile putFile );
 use vars qw( $SIGNATURE_KEY );
 
 # key that holds the signature in JSON structure
@@ -290,4 +289,14 @@ sub clean_temp_dir {
 	delete $self->{'tempdir'}
 }
 
+# put all data to a file owerwriting it if needed
+sub putFile {
+	my $path = shift;
+	my $content = shift;
+
+	open( my $f, ">", $path ) || 
+		carp "Error writing to the file $path: $!";
+	print $f $content;
+	close( $f );
+}
 1; 

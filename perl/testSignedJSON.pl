@@ -6,6 +6,9 @@
 use strict;
 use SignedJSON;
 use JSON;
+use utf8;
+use Encode;
+
 
 my $data = {
 	'a' => 'b',
@@ -13,6 +16,8 @@ my $data = {
 		{
 			'c1' => 'c1-1',
 			'c2' => 'c2-1',
+			'Русский' => 'ё',
+			'中' => '中國的',
 		},
 		{
 			'c1' => 'c1-2',
@@ -26,7 +31,7 @@ my $data = {
 };
 
 # plain json 
-my $plainjson = JSON->new->utf8(0)->pretty(0)->encode( $data );
+my $plainjson = encode('UTF-8', JSON->new->utf8(0)->pretty(0)->encode( $data ) );
 
 print "PLAIN JSON:\n$plainjson\n---------------------------\n";
 
@@ -61,7 +66,7 @@ if( $result ) {
 
 $signedjson =~ s/c1-3/c1-4/;
 
-my $result = $sJSON->verify( $signedjson );
+$result = $sJSON->verify( $signedjson );
 
 if( $result ) {
 	print "*** ERROR: VERIFICATION PASSED FOR ALTERED JSON\n";
@@ -73,7 +78,7 @@ if( $result ) {
 
 # now let's try to verify unsigned json
 
-my $result = $sJSON->verify( $plainjson );
+$result = $sJSON->verify( $plainjson );
 
 if( $result ) {
 	print "*** ERROR: VERIFICATION PASSED FOR UNSIGNED JSON\n";
