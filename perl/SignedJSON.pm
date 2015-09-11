@@ -303,7 +303,7 @@ sub putFile {
 	my $content = shift;
 
 	open( my $f, ">", $path ) || 
-		carp "Error writing to the file $path: $!";
+		croak "Error writing to the file $path: $!";
 	print $f $content;
 	close( $f );
 }
