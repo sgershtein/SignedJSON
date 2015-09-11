@@ -31,7 +31,8 @@ my $data = {
 };
 
 # plain json 
-my $plainjson = encode('UTF-8', JSON->new->utf8(0)->pretty(0)->encode( $data ) );
+my $plainjson = "  " . 
+    encode('UTF-8', JSON->new->utf8(0)->pretty(0)->encode( $data ) );
 
 print "PLAIN JSON:\n$plainjson\n---------------------------\n";
 
@@ -51,7 +52,7 @@ my $result = $sJSON->verify( $signedjson );
 
 if( $result ) {
 	print "VERIFICATION PASSED\n";
-	if( $result eq $plainjson ) {
+	if( $plainjson =~ /^\s*\Q$result\E\s*$/ ) {
 		print "RESULT EQUAL TO ORIGINAL JSON\n";
 	} else {
 		print "**** ERROR: RESULT NOT EQUAL TO ORIGINAL JSON\n";

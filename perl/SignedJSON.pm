@@ -164,6 +164,10 @@ sub sign {
 	# we don't need line breaks parsing here, so setting local $/ undefined
 	local( $/ );
 
+	# remove any whitespace before starting and after ending curly bracket
+	$json =~ s/^\s*{/{/;
+	$json =~ s/}\s*$/}/;
+
 	# store json to a temp file
 	my $datafile = $self->{'tempdir'}.'/data';
 	putFile( $datafile, $json );
@@ -209,6 +213,10 @@ sub verify {
 		# not a JSON or no signature
 		return undef;
 	}
+
+	# remove any whitespace before starting and after ending curly bracket
+	$json =~ s/^\s*{/{/;
+	$json =~ s/}\s*$/}/;
 
 	# do we have a public key?
 	croak "Need public key to make a signature"
