@@ -3,9 +3,18 @@ Simple way to add digital signature to plain JSON in a backward-compatible way
 
 We need a simple way to digitally sing JSON file keeping the signature embedded into the file.
 Why embedded?  Because having the signature separately in another file may cause ugly race conditions when either JSON file itself or its signature file gets cached by a proxy, requested a moment later after being updated, etc.  This can easily lead for the client to getting wrong (a future or a past) signature file that does not match the JSON data.  And there would be no easy way to distinguish this kind of race condition from a bad case when the data is indeed compromised.
-There are definitely ways to get around the race condition, e.g. we could keep the JSON payload and its signature in a single zip archive.  That's one way to do it.  We've chosen another way.
+There are definitely ways to get around the race condition, e.g. we could keep the JSON payload and its signature in a single zip archive.  That is one way to do it.  We've chosen another way.
 
 Our method is similar to the one described here: http://upon2020.com/blog/2014/03/digital-signatures-on-json-payloads-lets-call-it-jsonsig/ albeit more simple.  We only allow one signature per file and only embed the signature itself there as the public key required to verify the signature is already know to the client.
+
+The original json file:
+```
+{"a":"b"}
+```
+This is how it looks after adding a digital signature:
+```
+{"dgst_sha256_base64":"xxxx_base64_encoded_signature","a":"b"}
+```
 
 ### The process of signing is the following:
 
@@ -39,9 +48,11 @@ base64 -d signature64 >signature
 openssl gdst -verify public.pem -signature signature data.json
 ```
 
-## Perl module
+## Perl and Java module
 
-**SignedJSON.pm** perl module in perl subdir does all the work for signing JSON files this way and verifying signatures
+The following perl module and java class can be used for signing json and verifying signatures. They are of course interchangable, i.e. a json signed with perl can and should be verified in java and vice versa.  
+ * **SignedJSON.pm** [perl module](perl/) does all the work of signing JSON files this way and verifying signatures
+ * **SignedJSON** [java class](java/) does all the work of signing JSON files this way and verifying signatures
 
 ## License
 
