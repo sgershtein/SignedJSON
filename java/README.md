@@ -3,7 +3,7 @@ Simple way to add digital signature to plain JSON in a backward-compatible way
 
 ## Example usage to verify a signed json
 ```java
-SignedJSON signedJSON = new SigneJSON().setPublicKey(getResources().openRawResource(R.raw.publickey));
+SignedJSON signedJSON = new SignedJSON().setPublicKey(getResources().openRawResource(R.raw.publickey));
 byte[] json = someMethodThatReturnsSignedJson(); 
 
 try {
@@ -41,7 +41,7 @@ openssl genrsa -out private.pem 1024
 ```
 To save a public key in a file in der format that can be used by SignedJSON java class:
 ```
-penssl rsa -in private.pem -pubout -outform DER -out publickey.der
+openssl rsa -in private.pem -pubout -outform DER -out publickey.der
 ```
 To save a private key in PKCS#8 der format that can be used by SignedJSON java class:
 ```
