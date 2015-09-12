@@ -525,8 +525,23 @@ public class SignedJSON {
             ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
             byteOutput.write(SIGNED_JSON_START_STRING, 0, SIGNED_JSON_START_STRING.length);
             byteOutput.write(sig64, 0, sig64.length);
-            // TODO: 12.09.2015 Do not add a comma if there is no next field (empty json)
-            byteOutput.write(("\",").getBytes(), 0, 2);
+            byteOutput.write(("\"").getBytes(), 0, 1);
+
+            // now we should add a comma if and only if there is another field before the }
+            for( int i = 1; i<json.length; i++ ) {
+
+                if( !isWhitespace(json[i]) ) {
+
+                    if( json[i] != "}".getBytes()[0] ) {
+                        // the json block is not empty, need a comma
+                        byteOutput.write((",").getBytes(), 0, 1);
+                    }
+
+                    // in any case we're done as soon as we got to non-whitespace byte
+                    break;
+                }
+
+            }
 
             // store all the rest
             byteOutput.write(json, 1, json.length - 1);
@@ -578,7 +593,7 @@ public class SignedJSON {
             }
             sigEnd = pos - 1;
 
-            if(!skipSequence("\",")) {
+            if(!skipSequence("\"")) {
                 // there was no closing double quote up till the end of json.
                 // or there was no comma after the closing double quote
                 // in any case that's a format error
@@ -588,6 +603,9 @@ public class SignedJSON {
                 throw new BadJsonFormatException(
                         "JSON format error - no closing double quote for the signature");
             }
+            // there may or may not be a comma after the closing double quote
+            // it it's there it belongs to the signature block
+            skipSequence(",");
 
             sigBlockEnd = pos - 1;
             sigBlockStart = 1; // the signature block starts always right after the opening {
@@ -608,11 +626,7 @@ public class SignedJSON {
             int trimStart = 0;
 
             // skip all leading whitespace
-            while (trimStart < bytes.length &&
-                    (bytes[trimStart] == BYTE_SPACE ||
-                            bytes[trimStart] == BYTE_TAB ||
-                            bytes[trimStart] == BYTE_CR ||
-                            bytes[trimStart] == BYTE_LF)) {
+            while (trimStart < bytes.length && isWhitespace(bytes[trimStart])) {
                 trimStart++;
             }
 
@@ -623,12 +637,7 @@ public class SignedJSON {
             int trimEnd = bytes.length - 1;
 
             // skip all trailing whitespace
-            while (trimEnd >= 0 &&
-                    (bytes[trimEnd] == BYTE_SPACE ||
-                            bytes[trimEnd] == BYTE_TAB ||
-                            bytes[trimEnd] == BYTE_CR ||
-                            bytes[trimEnd] == BYTE_LF)
-                    ) {
+            while (trimEnd >= 0 && isWhitespace(bytes[trimEnd]) ) {
                 trimEnd--;
             }
 
@@ -637,6 +646,18 @@ public class SignedJSON {
             System.arraycopy(bytes, trimStart, result, 0, trimEnd - trimStart + 1);
 
             return result;
+        }
+
+        /**
+         * Check if the given byte is a whitespace character
+         * @param b the byte
+         * @return true if it is a whitespace
+         */
+        private boolean isWhitespace(byte b) {
+            return (b == BYTE_SPACE ||
+                    b == BYTE_TAB ||
+                    b == BYTE_CR ||
+                    b == BYTE_LF);
         }
 
         /**
