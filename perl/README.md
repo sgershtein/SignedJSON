@@ -14,7 +14,7 @@ SYNOPSIS
   # You don't have to specify both when initializing the object 
   $sJSON = new SignedJSON( {
             'privatekey' => '/some/place/private.pem',
-            'publickey' => '/some/place/public.key', 
+            'publickey' => '/some/place/public.pem', 
            } ); 
 
   # sign a plain json file.
@@ -35,7 +35,7 @@ The purpose of this module is to create digitally signed JSON file that is
 backward-compartible with the original unsigned file. The signature is
 embedded into the JSON structure as exactly one additional field that can
 be safely ignored by legacy parsers. All the JSON structure of the
-original file is kept intact. The field key is [1m"dgst_sha265_base64"[0m
+original file is kept intact. The field key is "dgst_sha256_base64"
 
 NOTE
 ----
