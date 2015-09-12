@@ -55,3 +55,31 @@ AUTHOR
 
 Sergey Gershtein <http://sergey.gershtein.net/>
 
+## How to generate keys and convert them to the required formats 
+To generate a keypair:
+```
+openssl genrsa -out private.pem 1024
+```
+To save a public key in a file in pem format that can be used by SignedJSON.pm module:
+```
+openssl rsa -in private.pem -pubout -outform PEM -out public.pem
+```
+Public key is only required to verify a signature that was created with the corresponding private key.  A private key is only required to generate a signature. A typical usage is having a public key with an application to verify signed json downloaded from the server.  The corresponding private key is secretely kept on server and is used to sign json files. 
+
+## License
+
+```
+Copyright 2015 Sergey Gershtein
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
