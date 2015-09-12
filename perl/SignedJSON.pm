@@ -66,7 +66,6 @@ use strict;
 use Carp;
 use File::Path qw( remove_tree );
 use MIME::Base64;
-use UR::Utilities qw( getFile putFile );
 use vars qw( $SIGNATURE_KEY );
 
 # key that holds the signature in JSON structure
@@ -165,6 +164,10 @@ sub sign {
 	# we don't need line breaks parsing here, so setting local $/ undefined
 	local( $/ );
 
+	# remove any whitespace before starting and after ending curly bracket
+	$json =~ s/^\s*{/{/;
+	$json =~ s/}\s*$/}/;
+
 	# store json to a temp file
 	my $datafile = $self->{'tempdir'}.'/data';
 	putFile( $datafile, $json );
@@ -210,6 +213,10 @@ sub verify {
 		# not a JSON or no signature
 		return undef;
 	}
+
+	# remove any whitespace before starting and after ending curly bracket
+	$json =~ s/^\s*{/{/;
+	$json =~ s/}\s*$/}/;
 
 	# do we have a public key?
 	croak "Need public key to make a signature"
@@ -290,4 +297,14 @@ sub clean_temp_dir {
 	delete $self->{'tempdir'}
 }
 
+# put all data to a file owerwriting it if needed
+sub putFile {
+	my $path = shift;
+	my $content = shift;
+
+	open( my $f, ">", $path ) || 
+		croak "Error writing to the file $path: $!";
+	print $f $content;
+	close( $f );
+}
 1; 
