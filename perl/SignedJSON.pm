@@ -188,7 +188,13 @@ sub sign {
 	$signature = encode_base64( $signature, "" );
 
 	# embed the signature into the provided json
-	$json =~ s/^(\s*{)/$1"$SIGNATURE_KEY":"$signature",/;
+	if( $json =~ /^\s*{\s*}/ ) {
+		# if it's an empty json, we don't add an extra comma
+		$json =~ s/^(\s*{)/$1"$SIGNATURE_KEY":"$signature"/;
+	} else {
+		# for a non-empty json the comma is required
+		$json =~ s/^(\s*{)/$1"$SIGNATURE_KEY":"$signature",/;
+	}
 
 	# remove temp files
 	$self->clean_temp_dir();
@@ -207,7 +213,7 @@ sub verify {
 	my $signature; 
 
 	# check if it's a signed json
-	if( $json =~ s/^(\s*{)"$SIGNATURE_KEY":"([^"]+)",/$1/ ) {
+	if( $json =~ s/^(\s*{)"$SIGNATURE_KEY":"([^"]+)",?/$1/ ) {
 		$signature = decode_base64( $2 );
 	} else {
 		# not a JSON or no signature

@@ -88,3 +88,28 @@ if( $result ) {
 } else {
 	print "*** ERROR: VERIFICATION FAILED FOR UNSIGNED JSON (should be signature not found)\n";
 }
+
+# now test signing and verifying an empty json
+
+my $emptyjson = " { } ";
+
+my $signedemptyjson = $sJSON->sign( $emptyjson );
+
+print "SIGNED EMPTY JSON:\n$signedemptyjson\n---------------------------\n";
+
+# let's verify signature
+
+$result = $sJSON->verify( $signedemptyjson );
+
+if( $result ) {
+	print "VERIFICATION PASSED\n";
+	if( $emptyjson =~ /^\s*\Q$result\E\s*$/ ) {
+		print "RESULT EQUAL TO ORIGINAL JSON\n";
+	} else {
+		print "**** ERROR: RESULT NOT EQUAL TO ORIGINAL JSON\n";
+	}
+} elsif( defined( $result ) ) {
+	print "*** ERROR: SIGNATURE NOT FOUND\n";
+} else {
+	print "*** ERROR: VERIFICATION FAILED\n";
+}
